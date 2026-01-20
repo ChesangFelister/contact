@@ -1,17 +1,17 @@
 const express = require('express');
-const app = express();
+const errorHandler = require('./middleware/errorHandler');
 const dotenv = require('dotenv').config();
+const { connectDb } = require('./config/dbConnection');
+
+connectDb();
+const app = express();
+
 const PORT = process.env.PORT || 5000;
+
 app.use(express.json());
 app.use("/api/contacts", require("./routes/contactRoutes"));
-app.use((err, req, res, next) => {
-  const statusCode = res.statusCode ? res.statusCode : 500;
-  res.status(statusCode);
-  res.json({
-    message: err.message,
-    stack: process.env.NODE_ENV === "production" ? null : err.stack
-  });
-});
+app.use("/api/user", require("./routes/userRoutes"));
+app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
